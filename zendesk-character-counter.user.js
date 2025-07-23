@@ -3,7 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      1.0
 // @description  Count characters in Zendesk responses and change color when exceeding 350 characters
-// @author       You
+// @author       igotdes
 // @match        https://*.zendesk.com/*
 // @match        https://*.zendeskgov.com/*
 // @grant        none
