@@ -1,20 +1,57 @@
 # Zendesk Character Counter
 
-A minimalist Tampermonkey script that adds a real-time character counter to Zendesk support responses. Perfect for keeping track of response length and staying within character limits.
+A configurable Tampermonkey script that adds a real-time character counter to Zendesk support responses. Customize character limits, colors, and choose which tickets trigger warnings based on subject keywords.
 
 ## Features
 
 - 🔢 **Real-time counting**: Updates as you type
+- ⚙️ **Configurable**: Customize limits, colors, and keywords
+- 🎯 **Smart filtering**: Show warnings only when certain keywords are found in ticket subjects
 - 🎨 **Color-coded warnings**: Visual feedback for character limits
 - 📍 **Smart positioning**: Integrates seamlessly with Zendesk toolbar
-- 🔄 **Auto-detection**: Works with both classic and modern Zendesk interfaces
+- 🔄 **Auto-detection**: Works with modern Zendesk interface
 - ⚡ **Lightweight**: Minimal performance impact
 
 ## Visual Indicators
 
+**Default settings:**
 - **Gray**: Normal count (0-300 characters)
 - **Orange**: Approaching limit (301-350 characters) 
 - **Dark Red**: Over limit (351+ characters)
+
+**Note**: Colors only appear when ticket subjects contain your configured keywords (unless disabled).
+
+## Configuration
+
+All settings can be easily customized by editing the top section of the script:
+
+### Character Limits
+```javascript
+const WARNING_THRESHOLD = 300;  // When to show warning color
+const DANGER_THRESHOLD = 350;   // When to show danger color
+```
+
+### Colors
+```javascript
+const NORMAL_COLOR = '#666';    // Gray for normal count
+const WARNING_COLOR = '#ff8800'; // Orange for approaching limit
+const DANGER_COLOR = '#cc0000';  // Dark red for over limit
+```
+
+### Keyword Filtering
+```javascript
+// Show warnings only for tickets containing these keywords
+const TRIGGER_KEYWORDS = [
+    'social media',
+    'twitter',
+    'facebook',
+    'instagram',
+    'public response'
+];
+
+// To show warnings for ALL tickets, use:
+const TRIGGER_KEYWORDS = [];
+```
 
 ## Installation
 
@@ -39,12 +76,14 @@ That's it! The character counter will automatically appear in the bottom-right o
 
 ## Usage
 
-The counter appears automatically when you:
+The counter appears automatically in the lower-right corner of the text editor when you:
 1. Click into a Zendesk ticket response field
 2. Start typing your response
 3. Navigate between different tickets
 
-No configuration needed - it just works!
+**Keyword Filtering**: By default, color warnings only appear for tickets whose subjects contain your configured keywords. This helps focus attention on responses where character limits matter most.
+
+**All Tickets Mode**: Set `TRIGGER_KEYWORDS = []` to show warnings for every ticket.
 
 ## Character Limit Guidelines
 
@@ -54,29 +93,34 @@ The default script uses a 350-character warning threshold, which is commonly use
 - Brief, concise support responses
 - Internal team guidelines
 
-You can modify these limits by editing the script (see [Customization](#customization) below).
+## Customization Examples
 
-## Customization
-
-### Changing Character Limits
-Edit these lines in the script to adjust warning thresholds:
+### Social Media Team Setup
 ```javascript
-if (charCount > 350) {        // Over limit threshold
-if (charCount > 300) {        // Warning threshold
+const WARNING_THRESHOLD = 200;
+const DANGER_THRESHOLD = 280;
+const TRIGGER_KEYWORDS = ['twitter', 'facebook', 'instagram', 'social media'];
 ```
 
-### Changing Colors
-Modify the color values:
+### Customer Success Team
 ```javascript
-counter.style.color = '#cc0000'; // Dark red for over limit
-counter.style.color = '#ff8800'; // Orange for warning
-counter.style.color = '#666';    // Gray for normal
+const WARNING_THRESHOLD = 500;
+const DANGER_THRESHOLD = 750;
+const TRIGGER_KEYWORDS = ['escalation', 'complaint', 'urgent'];
 ```
 
-### Changing Position
-Adjust the positioning in the CSS:
+### SMS Support Team
 ```javascript
-right: 10px;  // Distance from right edge
+const WARNING_THRESHOLD = 140;
+const DANGER_THRESHOLD = 160;
+const TRIGGER_KEYWORDS = []; // Show for all tickets
+```
+
+### Custom Color Scheme
+```javascript
+const NORMAL_COLOR = '#4a90e2';   // Blue
+const WARNING_COLOR = '#f5a623';  // Amber
+const DANGER_COLOR = '#d0021b';   // Bright red
 ```
 
 ## Troubleshooting
@@ -104,15 +148,6 @@ This project welcomes community contributions! The original author has limited a
 - **Suggest features** or improvements
 - **Submit pull requests** with fixes or enhancements
 - **Fork the project** to create your own version
-- **Become a maintainer** - reach out if you're interested in helping maintain this project
-
-### For Maintainers
-If you're interested in becoming a regular contributor or maintainer:
-1. Start by submitting a few quality pull requests
-2. Comment on issues to help other users
-3. Reach out via issues or discussions about taking on maintainer responsibilities
-
-The project is designed to be community-driven and welcomes new maintainers who want to keep it updated and improved.
 
 ### Development
 The script is well-commented and easy to modify. Key functions:
@@ -122,7 +157,8 @@ The script is well-commented and easy to modify. Key functions:
 
 ## Version History
 
-- **v1.0** - Initial public release with real-time character counting, color-coded warnings, and smart positioning
+- **v1.1** - Added keyword filtering for ticket subjects and user-friendly configuration section for limits, colors, and keywords
+- **v1.0** - Initial public release with real-time character counting and basic color warnings
 
 ## License
 
@@ -130,7 +166,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Support
 
-**Community Support**: This project relies on community support. While the original author may not be able to provide immediate responses, the community is encouraged to help each other.
+**Community Support**: This project relies on community support for ongoing maintenance and improvements.
 
 If you encounter issues:
 1. Check the [troubleshooting section](#troubleshooting)
