@@ -1,3 +1,14 @@
+// ==UserScript==
+// @name         Zendesk Character Counter
+// @namespace    http://tampermonkey.net/
+// @version      1.0
+// @description  Count characters in Zendesk responses and change color when exceeding 350 characters
+// @author       You
+// @match        https://*.zendesk.com/*
+// @match        https://*.zendeskgov.com/*
+// @grant        none
+// ==/UserScript==
+
 // Find the container to position the counter relative to (fallback function)
     function findEditorContainer(textElement) {
         let container = textElement;
@@ -32,16 +43,7 @@
         }
         
         return textElement.parentElement || textElement;
-    }// ==UserScript==
-// @name         Zendesk Character Counter
-// @namespace    http://tampermonkey.net/
-// @version      1.0
-// @description  Count characters in Zendesk responses and change color when exceeding 350 characters
-// @author       You
-// @match        https://*.zendesk.com/*
-// @match        https://*.zendeskgov.com/*
-// @grant        none
-// ==/UserScript==
+    }
 
 (function() {
     'use strict';
