@@ -19,13 +19,13 @@ const NORMAL_COLOR = '#666';    // Gray for normal count
 const WARNING_COLOR = '#ff8800'; // Orange for approaching limit
 const DANGER_COLOR = '#cc0000';  // Dark red for over limit
 
-// Keyword filtering (case-insensitive):
-// Color warnings will only appear when the ticket subject contains one of these keywords
-// Set to empty array [] to show color warnings for ALL tickets
+// Show warnings only for tickets containing these keywords
 const TRIGGER_KEYWORDS = [
-    '★☆☆☆☆',
-    '★★☆☆☆',
-    '★★★☆☆'
+    'social media',
+    'twitter',
+    'facebook',
+    'instagram',
+    'public response'
 ];
 // ===== END USER CONFIGURATION =====
 
