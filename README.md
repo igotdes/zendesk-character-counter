@@ -178,4 +178,4 @@ If you encounter issues:
 
 ---
 
-**Made with ❤️ for support teams using Zendesk**
+**Made with ❤️ for support teams that use Zendesk**
