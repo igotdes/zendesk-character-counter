@@ -1,15 +1,79 @@
 // ==UserScript==
 // @name         Zendesk Character Counter
 // @namespace    http://tampermonkey.net/
-// @version      1.0
-// @description  Count characters in Zendesk responses and change color when exceeding 350 characters
+// @version      1.1
+// @description  Zendesk character counter with configurable limits and optional keyword filtering
 // @author       igotdes
 // @match        https://*.zendesk.com/*
 // @match        https://*.zendeskgov.com/*
 // @grant        none
 // ==/UserScript==
 
-// Find the container to position the counter relative to (fallback function)
+// ===== USER CONFIGURATION =====
+// Character limit thresholds:
+const WARNING_THRESHOLD = 300;  // When to show warning color
+const DANGER_THRESHOLD = 350;   // When to show danger color
+
+// Colors for different states:
+const NORMAL_COLOR = '#666';    // Gray for normal count
+const WARNING_COLOR = '#ff8800'; // Orange for approaching limit
+const DANGER_COLOR = '#cc0000';  // Dark red for over limit
+
+// Keyword filtering (case-insensitive):
+// Color warnings will only appear when the ticket subject contains one of these keywords
+// Set to empty array [] to show color warnings for ALL tickets
+const TRIGGER_KEYWORDS = [
+    '★☆☆☆☆',
+    '★★☆☆☆',
+    '★★★☆☆'
+];
+// ===== END USER CONFIGURATION =====
+
+// Check if current ticket subject matches trigger keywords
+    function shouldShowColorWarnings() {
+        // If no keywords configured, always show warnings
+        if (TRIGGER_KEYWORDS.length === 0) {
+            return true;
+        }
+
+        // Look for ticket subject in various possible locations
+        const subjectSelectors = [
+            '[data-test-id="omni-header-subject"]', // Modern Zendesk subject input
+            '[data-test-id="ticket-pane-subject"]',
+            '[data-test-id="ticket-subject"]',
+            '.ticket-subject',
+            'h1[title]',
+            '.pane_header h2',
+            '.subject'
+        ];
+
+        for (let selector of subjectSelectors) {
+            const element = document.querySelector(selector);
+            if (element) {
+                // Get subject text from different possible sources
+                const subject = (
+                    element.value ||           // For input fields
+                    element.textContent ||
+                    element.title ||
+                    ''
+                ).toLowerCase();
+
+                if (subject.trim() === '') {
+                    continue; // Try next selector if subject is empty
+                }
+
+                // Check if any keyword matches
+                const hasMatch = TRIGGER_KEYWORDS.some(keyword =>
+                    subject.includes(keyword.toLowerCase())
+                );
+
+                return hasMatch;
+            }
+        }
+
+        // Default to showing warnings if subject not found
+        return true;
+    }    // Find the container to position the counter relative to (fallback function)
     function findEditorContainer(textElement) {
         let container = textElement;
         const containerSelectors = [
@@ -20,7 +84,7 @@
             '[data-test-id="composer"]',
             '.editor-container'
         ];
-        
+
         // Look for parent containers
         let parent = textElement.parentElement;
         while (parent && parent !== document.body) {
@@ -31,7 +95,7 @@
             }
             parent = parent.parentElement;
         }
-        
+
         // If no specific container found, use the text element's closest positioned parent
         parent = textElement.parentElement;
         while (parent && parent !== document.body) {
@@ -41,7 +105,7 @@
             }
             parent = parent.parentElement;
         }
-        
+
         return textElement.parentElement || textElement;
     }
 
@@ -56,7 +120,7 @@
         if (counter) {
             counter.remove();
         }
-        
+
         counter = document.createElement('div');
         counter.id = 'char-counter';
         counter.style.cssText = `
@@ -82,22 +146,25 @@
     // Update counter display
     function updateCounter(charCount) {
         if (!counter) return;
-        
+
         counter.textContent = charCount;
-        
-        if (charCount > 350) {
-            counter.style.color = '#cc0000'; // Darker red for over limit
-        } else if (charCount > 300) {
-            counter.style.color = '#ff8800'; // Orange for approaching limit
+
+        // Check if we should show color warnings based on subject
+        const showWarnings = shouldShowColorWarnings();
+
+        if (showWarnings && charCount > DANGER_THRESHOLD) {
+            counter.style.color = DANGER_COLOR;
+        } else if (showWarnings && charCount > WARNING_THRESHOLD) {
+            counter.style.color = WARNING_COLOR;
         } else {
-            counter.style.color = '#666'; // Gray for normal
+            counter.style.color = NORMAL_COLOR;
         }
     }
 
     // Get text content from various input types
     function getTextContent(element) {
         if (!element) return '';
-        
+
         if (element.tagName === 'TEXTAREA') {
             return element.value || '';
         } else if (element.contentEditable === 'true' || element.isContentEditable) {
@@ -117,7 +184,7 @@
         if (toolbar) {
             return toolbar;
         }
-        
+
         // Fallback selectors for other toolbar elements
         const fallbackSelectors = [
             '.omnichannel-composer-toolbar',
@@ -126,34 +193,34 @@
             '.zendesk-editor .toolbar',
             '.composer .toolbar'
         ];
-        
+
         for (let selector of fallbackSelectors) {
             const element = document.querySelector(selector);
             if (element) {
                 return element;
             }
         }
-        
+
         return null;
     }
 
     // Setup monitoring for an element
     function setupMonitoring(element) {
         if (currentTextArea === element) return;
-        
+
         currentTextArea = element;
         console.log('Setting up monitoring for:', element);
-        
+
         // Remove existing counter
         if (counter) {
             counter.remove();
             counter = null;
         }
-        
+
         // Create new counter and position it in the toolbar
         const newCounter = createCounter();
         const toolbar = findToolbarContainer();
-        
+
         if (toolbar) {
             // Make sure toolbar has relative positioning
             if (window.getComputedStyle(toolbar).position === 'static') {
@@ -175,18 +242,12 @@
         const updateCharCount = () => {
             const text = getTextContent(element);
             const charCount = text.length;
-            
-            // Debug logging to see what's being counted
-            console.log('Raw text length:', text.length);
-            console.log('Raw text (first 20 chars):', JSON.stringify(text.substring(0, 20)));
-            console.log('Character codes:', text.split('').slice(0, 5).map(char => char.charCodeAt(0)));
-            
             updateCounter(charCount);
         };
 
         // Remove existing event listeners by cloning the element
         const events = ['input', 'keyup', 'keydown', 'paste', 'cut', 'change'];
-        
+
         events.forEach(eventType => {
             element.addEventListener(eventType, updateCharCount);
         });
@@ -215,21 +276,21 @@
             'textarea[data-test-id="omni-log-text-area"]',
             '[data-test-id="composer"] textarea',
             '[data-test-id="composer"] [contenteditable="true"]',
-            
+
             // Rich text editors
             '.zendesk-editor [contenteditable="true"]',
             '.DraftEditor-editorContainer [contenteditable="true"]',
             '.rich-text-editor [contenteditable="true"]',
-            
+
             // Classic Zendesk
             'textarea[name="comment[body]"]',
             'textarea.comment',
             '#comment_body',
-            
+
             // Generic fallbacks
             'textarea:focus',
             '[contenteditable="true"]:focus',
-            
+
             // Any textarea or contenteditable in composer/editor areas
             '.composer textarea',
             '.composer [contenteditable="true"]',
@@ -242,8 +303,8 @@
             for (let element of elements) {
                 // Check if element is visible and not disabled
                 const style = window.getComputedStyle(element);
-                if (style.display !== 'none' && 
-                    style.visibility !== 'hidden' && 
+                if (style.display !== 'none' &&
+                    style.visibility !== 'hidden' &&
                     !element.disabled &&
                     element.offsetHeight > 0) {
                     console.log('Found active text input:', selector, element);
@@ -251,14 +312,14 @@
                 }
             }
         }
-        
+
         return null;
     }
 
     // Main initialization and monitoring
     function init() {
         console.log('Zendesk Character Counter initialized');
-        
+
         function checkForTextInput() {
             const activeInput = findActiveTextInput();
             if (activeInput && activeInput !== currentTextArea) {
@@ -268,10 +329,10 @@
 
         // Initial check
         setTimeout(checkForTextInput, 1000);
-        
+
         // Regular checks for new text inputs
         setInterval(checkForTextInput, 3000);
-        
+
         // Check when user focuses on elements
         document.addEventListener('focusin', (e) => {
             const target = e.target;
