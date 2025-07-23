@@ -31,10 +31,10 @@ That's it! The character counter will automatically appear in the bottom-right o
 
 ## Compatibility
 
-- ✅ Modern Zendesk interface
-- ✅ Classic Zendesk interface  
-- ✅ Rich text editors
-- ✅ Plain text areas
+- ✅ **Modern Zendesk interface** (tested and confirmed)
+- ❓ Classic Zendesk interface (untested - may work)
+- ❓ Rich text editors (untested - may work)
+- ❓ Plain text areas (untested - may work)
 - ✅ All major browsers (Chrome, Firefox, Safari, Edge)
 
 ## Usage
@@ -142,4 +142,4 @@ If you encounter issues:
 
 ---
 
-**Made with ❤️ for Zendesk support teams**
+**Made with ❤️ for support teams using Zendesk**
