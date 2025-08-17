@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Zendesk Character Counter
 // @namespace    http://tampermonkey.net/
-// @version      1.1
+// @version      1.2
 // @description  Zendesk character counter with configurable limits and optional keyword filtering
 // @author       igotdes
 // @match        https://*.zendesk.com/*
@@ -21,11 +21,9 @@ const DANGER_COLOR = '#cc0000';  // Dark red for over limit
 
 // Show warnings only for tickets containing these keywords
 const TRIGGER_KEYWORDS = [
-    'social media',
-    'twitter',
-    'facebook',
-    'instagram',
-    'public response'
+    '★☆☆☆☆',
+    '★★☆☆☆',
+    '★★★☆☆'
 ];
 // ===== END USER CONFIGURATION =====
 
@@ -171,7 +169,8 @@ const TRIGGER_KEYWORDS = [
             // Get plain text, removing HTML tags and trimming whitespace
             let text = element.textContent || element.innerText || '';
             // Remove any zero-width characters, non-breaking spaces, and trim whitespace/newlines
-            text = text.replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
+            text = text.replace(/[\u200B-\u200D\uFEFF]/g, '');
+            text = text.replace(/^\n+|\n+$/g, ''); // Only remove leading/trailing newlines
             return text;
         }
         return '';
