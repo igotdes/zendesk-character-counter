@@ -11,8 +11,8 @@
 
 // ===== USER CONFIGURATION =====
 // Character limit thresholds:
-const WARNING_THRESHOLD = 300;  // When to show warning color
-const DANGER_THRESHOLD = 350;   // When to show danger color
+const WARNING_THRESHOLD = 200;  // When to show warning color
+const DANGER_THRESHOLD = 280;   // When to show danger color
 
 // Colors for different states:
 const NORMAL_COLOR = '#666';    // Gray for normal count
@@ -21,9 +21,10 @@ const DANGER_COLOR = '#cc0000';  // Dark red for over limit
 
 // Show warnings only for tickets containing these keywords
 const TRIGGER_KEYWORDS = [
-    '★☆☆☆☆',
-    '★★☆☆☆',
-    '★★★☆☆'
+    'social media',
+    'twitter', 
+    'facebook',
+    'instagram'
 ];
 // ===== END USER CONFIGURATION =====
 
