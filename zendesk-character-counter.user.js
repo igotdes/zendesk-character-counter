@@ -22,7 +22,7 @@ const DANGER_COLOR = '#cc0000';  // Dark red for over limit
 // Show warnings only for tickets containing these keywords
 const TRIGGER_KEYWORDS = [
     'social media',
-    'twitter', 
+    'twitter',
     'facebook',
     'instagram'
 ];
