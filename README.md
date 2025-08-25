@@ -157,6 +157,7 @@ The script is well-commented and easy to modify. Key functions:
 
 ## Version History
 
+- **v1.3** - Added smart positioning for Zendesk Messaging
 - **v1.2** - Fixed space counting issue with multiple and leading/trailing spaces
 - **v1.1** - Added keyword filtering for ticket subjects and user-friendly configuration section for limits, colors, and keywords
 - **v1.0** - Initial public release with real-time character counting and basic color warnings
