@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Zendesk Character Counter
 // @namespace    http://tampermonkey.net/
-// @version      1.2
+// @version      1.3
 // @description  Zendesk character counter with configurable limits and optional keyword filtering
 // @author       igotdes
 // @match        https://*.zendesk.com/*
@@ -138,6 +138,29 @@ const TRIGGER_KEYWORDS = [
             display: flex;
             align-items: center;
         `;
+
+        // Smart positioning with retry logic
+        function positionCounter() {
+            const toolbar = document.querySelector('[data-test-id="omnichannel-composer-toolbar"]');
+            const sendButton = toolbar?.querySelector('[data-test-id="omnichannel-omnicomposer-send-button"]');
+            
+            let rightPosition = '10px';
+            if (sendButton && sendButton.parentElement) {
+                const toolbarRect = toolbar.getBoundingClientRect();
+                const containerRect = sendButton.parentElement.getBoundingClientRect();
+                
+                if (toolbarRect.width > 0 && containerRect.width > 0) {
+                    const containerLeftFromRight = toolbarRect.width - (containerRect.left - toolbarRect.left);
+                    rightPosition = `${containerLeftFromRight + 10}px`;
+                }
+            }
+            
+            counter.style.right = rightPosition;
+        }
+
+        // Position immediately, with fallback retries
+        setTimeout(positionCounter, 0);
+        setTimeout(positionCounter, 100);
         counter.textContent = '0';
         return counter;
     }
